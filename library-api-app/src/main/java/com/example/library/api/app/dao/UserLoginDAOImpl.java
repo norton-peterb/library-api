@@ -1,47 +1,47 @@
 package com.example.library.api.app.dao;
 
 import com.example.library.api.app.bean.UserLogin;
-import com.example.library.api.app.entity.UserLoginEntity;
-import com.example.library.api.app.repository.UserLoginEntityRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.sql.Types;
 import java.util.Optional;
 
 @Component
 public class UserLoginDAOImpl implements UserLoginDAO {
 
-    private final UserLoginEntityRepository repository;
+    private static final String SQL_GET_USER_FOR_USERNAME =
+            "SELECT username,password,roles,email FROM user_login WHERE username = ?";
+    private static final String SQL_CREATE_NEW_USER =
+            "INSERT INTO user_login (username,password,roles,email) VALUES(?,?,?,?)";
 
-    public UserLoginDAOImpl(@Autowired UserLoginEntityRepository repository) {
-        this.repository = repository;
+    private final JdbcTemplate jdbcTemplate;
+
+    public UserLoginDAOImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public Optional<UserLogin> getUserForUsername(String username) {
-        List<UserLoginEntity> userLoginEntities = repository.findByUsername(username);
-        if(userLoginEntities.isEmpty()) {
-            return Optional.empty();
-        } else if(userLoginEntities.size() == 1) {
-            UserLogin userLogin = new UserLogin();
-            userLogin.setUsername(userLoginEntities.get(0).getUsername());
-            userLogin.setPassword(userLoginEntities.get(0).getPassword());
-            userLogin.setRole(userLoginEntities.get(0).getRoles());
-            userLogin.setEmail(userLoginEntities.get(0).getEmail());
-            return Optional.of(userLogin);
-        } else {
-            throw new RuntimeException("Unexpected Number of Users found for username");
-        }
+        ResultHolder<UserLogin> resultHolder = new ResultHolder<>();
+        jdbcTemplate.query(SQL_GET_USER_FOR_USERNAME,new Object[]{username},
+                new int[]{Types.VARCHAR},resultSet -> {
+                    UserLogin userLogin = new UserLogin();
+                    userLogin.setUsername(resultSet.getString("username"));
+                    userLogin.setPassword(resultSet.getString("password"));
+                    userLogin.setRole(resultSet.getString("roles"));
+                    userLogin.setEmail(resultSet.getString("email"));
+                    resultHolder.setResult(userLogin);
+                });
+        return resultHolder.getResultOptional();
     }
 
     @Override
     public void createNewUser(UserLogin userLogin) {
-        UserLoginEntity userLoginEntity = new UserLoginEntity();
-        userLoginEntity.setUsername(userLogin.getUsername());
-        userLoginEntity.setPassword(userLogin.getPassword());
-        userLoginEntity.setRoles(userLogin.getRole());
-        userLoginEntity.setEmail(userLogin.getEmail());
-        repository.save(userLoginEntity);
+        jdbcTemplate.update(SQL_CREATE_NEW_USER,
+                userLogin.getUsername(),
+                userLogin.getPassword(),
+                userLogin.getRole(),
+                userLogin.getEmail());
     }
 }
