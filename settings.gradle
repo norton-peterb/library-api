@@ -1,2 +1,3 @@
 rootProject.name = 'library-api'
 include 'library-api-app'
+include 'library-api-db'

@@ -1,0 +1,54 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="user_login" author="nortonp">
+        <createTable tableName="user_login">
+            <column name="id" type="integer">
+                <constraints primaryKey="true" primaryKeyName="pk_user_login"/>
+            </column>
+            <column name="username" type="varchar(24)">
+                <constraints unique="true" uniqueConstraintName="uc_user_login"/>
+            </column>
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="user_login_001" author="nortonp">
+        <addColumn tableName="user_login">
+            <column name="roles" type="varchar(255)" defaultValue="ROLE_USER">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="user_login_002" author="nortonp">
+        <createSequence sequenceName="seq_user_login" startValue="1" incrementBy="1"/>
+        <createProcedure>
+            CREATE OR REPLACE FUNCTION tr_insert_user_login() RETURNS trigger
+            LANGUAGE plpgsql
+            AS $$
+            BEGIN
+            IF NEW.id IS NULL THEN
+            NEW.id:=nextval('seq_user_login');
+            END IF;
+            RETURN NEW;
+            END;
+            $$;
+        </createProcedure>
+        <sql>
+            CREATE TRIGGER tr_insert_user_login BEFORE INSERT ON user_login
+            FOR EACH ROW EXECUTE PROCEDURE tr_insert_user_login();
+        </sql>
+    </changeSet>
+
+    <changeSet id="user_login_003" author="nortonp">
+        <sql>
+            GRANT SELECT,INSERT ON user_login TO libuser;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

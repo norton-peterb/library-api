@@ -1,7 +1,9 @@
 package com.example.library.api.app.configuration;
 
+import com.example.library.api.app.dao.UserLoginDAO;
 import com.example.library.api.app.encoder.Base64PasswordEncoder;
-import com.example.library.api.app.service.PlaceholderUserDetailsService;
+import com.example.library.api.app.service.DatabaseUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,7 +18,7 @@ public class LibraryApiConfiguration {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return new PlaceholderUserDetailsService();
+    public UserDetailsService userDetailsService(@Autowired UserLoginDAO userLoginDAO) {
+        return new DatabaseUserDetailsService(userLoginDAO);
     }
 }
