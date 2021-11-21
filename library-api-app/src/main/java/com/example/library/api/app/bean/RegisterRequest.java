@@ -1,9 +1,8 @@
 package com.example.library.api.app.bean;
 
-public class UserLogin {
+public class RegisterRequest {
     private String username;
     private String password;
-    private String role;
     private String email;
 
     public String getUsername() {
@@ -22,28 +21,11 @@ public class UserLogin {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    @Override
-    public String toString() {
-        return "UserLogin{" +
-                "username='" + username + '\'' +
-                ", role='" + role + '\'' +
-                ", email='" + email + '\'' +
-                '}';
     }
 }

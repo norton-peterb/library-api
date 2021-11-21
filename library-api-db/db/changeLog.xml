@@ -14,18 +14,13 @@
             <column name="password" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-        </createTable>
-    </changeSet>
-
-    <changeSet id="user_login_001" author="nortonp">
-        <addColumn tableName="user_login">
             <column name="roles" type="varchar(255)" defaultValue="ROLE_USER">
                 <constraints nullable="false"/>
             </column>
-        </addColumn>
-    </changeSet>
-
-    <changeSet id="user_login_002" author="nortonp">
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
         <createSequence sequenceName="seq_user_login" startValue="1" incrementBy="1"/>
         <createProcedure>
             CREATE OR REPLACE FUNCTION tr_insert_user_login() RETURNS trigger
@@ -43,11 +38,9 @@
             CREATE TRIGGER tr_insert_user_login BEFORE INSERT ON user_login
             FOR EACH ROW EXECUTE PROCEDURE tr_insert_user_login();
         </sql>
-    </changeSet>
-
-    <changeSet id="user_login_003" author="nortonp">
         <sql>
             GRANT SELECT,INSERT ON user_login TO libuser;
+            GRANT USAGE ON seq_user_login TO libuser;
         </sql>
     </changeSet>
 
