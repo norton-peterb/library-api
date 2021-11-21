@@ -1,4 +1,4 @@
-package com.example.library.api.app.configuration;
+package com.example.library.api.app.controller;
 
 import com.example.library.api.app.bean.RegisterRequest;
 import com.example.library.api.app.bean.RegisterResponse;
