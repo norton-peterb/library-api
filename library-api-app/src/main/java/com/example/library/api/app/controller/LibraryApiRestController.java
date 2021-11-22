@@ -50,6 +50,18 @@ public class LibraryApiRestController {
         return null;
     }
 
+    @GetMapping(path = "/books/checkedOut",produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured("ROLE_ADMIN")
+    public List<Book> getCheckedOutBooks() {
+        return bookDAO.getCheckedOutBooks();
+    }
+
+    @GetMapping(path = "/books/overdue",produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured("ROLE_ADMIN")
+    public List<Book> getOverdueBooks() {
+        return bookDAO.getOverdueBooks();
+    }
+
     @PostMapping(path = "/books/checkout",produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
     @Secured("ROLE_USER")

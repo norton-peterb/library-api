@@ -20,11 +20,28 @@ public class BookDAOImpl implements BookDAO {
             "SELECT id FROM user_login WHERE username = ?";
     private static final String SQL_APPLY_CHECKOUT =
             "UPDATE book SET user_login_id = ?,due_date = ? WHERE title = ?";
+    private static final String SQL_GET_CHECKED_OUT_BOOKS =
+            "SELECT b.title,username,b.due_date FROM book b " +
+                    "JOIN user_login ul ON b.user_login_id = ul.id";
+    private static final String SQL_GET_OVERDUE_BOOK =
+            "SELECT b.title,username,b.due_date FROM book b " +
+                    "JOIN user_login ul ON b.user_login_id = ul.id " +
+                    "WHERE b.due_date > ?";
 
     private final JdbcTemplate jdbcTemplate;
 
     public BookDAOImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    private Date getNextDayDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR,0);
+        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.SECOND,0);
+        calendar.set(Calendar.MILLISECOND,0);
+        calendar.add(Calendar.DAY_OF_YEAR,1);
+        return calendar.getTime();
     }
 
     @Override
@@ -69,5 +86,21 @@ public class BookDAOImpl implements BookDAO {
                     idOptional.get(),dueDate,book.getTitle());
             return dueDate;
         }
+    }
+
+    @Override
+    public List<Book> getCheckedOutBooks() {
+        BookRowCallbackHandler rowCallbackHandler = new BookRowCallbackHandler();
+        jdbcTemplate.query(SQL_GET_CHECKED_OUT_BOOKS,rowCallbackHandler);
+        return rowCallbackHandler.getBookResults();
+    }
+
+    @Override
+    public List<Book> getOverdueBooks() {
+        Date cutoffTime = getNextDayDate();
+        BookRowCallbackHandler rowCallbackHandler = new BookRowCallbackHandler();
+        jdbcTemplate.query(SQL_GET_OVERDUE_BOOK,new Object[]{cutoffTime},
+                new int[]{Types.DATE},rowCallbackHandler);
+        return rowCallbackHandler.getBookResults();
     }
 }

@@ -82,4 +82,11 @@
         </sql>
     </changeSet>
 
+    <changeSet id="default_admin" author="nortonp">
+        <sql>
+            INSERT INTO user_login (username,password,roles,email)
+            VALUES('admin','YWRtaW4wMTE=','ROLE_ADMIN','admin@local');
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
