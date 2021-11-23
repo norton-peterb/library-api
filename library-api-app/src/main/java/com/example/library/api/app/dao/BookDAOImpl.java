@@ -3,6 +3,7 @@ package com.example.library.api.app.dao;
 import com.example.library.api.app.bean.Book;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Types;
 import java.util.*;
@@ -69,6 +70,7 @@ public class BookDAOImpl implements BookDAO {
     }
 
     @Override
+    @Transactional
     public Date performCheckout(Book book, String username) {
         ResultHolder<Long> id = new ResultHolder<>();
         jdbcTemplate.query(SQL_GET_USER_ID,new Object[]{username},

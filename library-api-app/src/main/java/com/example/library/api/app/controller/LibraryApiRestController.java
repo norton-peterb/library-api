@@ -29,12 +29,6 @@ public class LibraryApiRestController {
         this.bookDAO = bookDAO;
     }
 
-    @GetMapping(path = "/test",produces = MediaType.TEXT_HTML_VALUE)
-    @Secured("ROLE_USER")
-    public String testService() {
-        return "<HTML><BODY><H1>Test Page OK</H1><HR></BODY></HTML>";
-    }
-
     @GetMapping(path = "/books/available",produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured("ROLE_USER")
     public List<String> availableBooks() {

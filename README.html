@@ -1,0 +1,129 @@
+<HTML>
+<BODY>
+<H1>library-api</H1>
+<P>Please find instructions and details below on how to run the project</P>
+<H2>Database</H2>
+<P>
+The project is backed by a simple SQL database with build scripts
+provided for PostGreSQL in the form of liquibase XML.
+</P>
+<H3>Pre-Requisites</H3>
+<P>
+The first stage will be create a new database in Postgres with
+the following command as the postgres user on the Postgres server
+or container:
+</P>
+<pre>createdb &lt;Name of Database></pre>
+<p>
+A suitable admin user should be available to build the database.
+The user can be created from the postgres user on the command
+line with the following command:
+</p>
+    <pre>createuser -P -s -e &lt;User Name></pre>
+<p>
+This used should then be used with the gradle.properties
+file which contains the credentials and JDBC connection string, these should
+be checked and edited as per your database server.
+</p><p><
+In addition it is sensible to create a non admin user
+in Postgres with the command:
+</p>
+    <pre>createuser -P &lt;User Name></pre>
+    <h3>Installation</h3>
+<p>
+The database is installed by runnning the liquibase->update
+task from the library-api-db project.
+</p>
+    <h2>Application</h2>
+
+    <h3>Build</h3>
+<p>
+The application jar can be built using the bootJar task of the library-api-app
+project.
+</p>
+    <h3>Configuration</h3>
+<p>
+The application is a single jar spring boot application which
+should be configured with the following properties in the
+application.properties file:
+</p>
+    <pre>
+jwt.secret=&lt;Token Secret>
+spring.datasource.username=&lt;Database Non Admin User>
+spring.datasource.password=&lt;Database Non Admin User Password>
+spring.datasource.driver-class=org.postgresql.Driver
+spring.datasource.url=jdbc:postgresql://&lt;Database Hostname>:5432/&lt;Database Name>
+    </pre>
+<p>
+The properties will need to be altered as per your environment
+specifically the database settings. The application can then be run in the
+usual manner:
+</p>
+<pre>java -jar library-api-app.jar</pre>
+<h3>Users</h3>
+<p>
+There is only one existing user on database load called admin with the password
+admin011. This user has the ROLE_ADMIN role which allows use of all the
+rest services. An additional ROLE_USER role is used for registered users who
+are limited to checking out books and viewing available books.
+</p>
+<h3>Rest Services</h3>
+<p>
+The application exposes the following Rest Services
+</p>
+<p>
+<table border="1">
+    <tr>
+        <th>Method</th>
+        <th>Path</th>
+        <th>Input</th>
+        <th>Output</th>
+        <th>Role</th>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td>/register</td>
+        <td>RegisterRequest</td>
+        <td>RegisterResponse</td>
+        <td>NONE</td>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td>/authenticate</td>
+        <td>AuthenticationRequest</td>
+        <td>AuthenticationResponse</td>
+        <td>ROLE_USER or ROLE_ADMIN</td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td>/books/available</td>
+        <td>None</td>
+        <td>List&lt;String></td>
+        <td>ROLE_USER</td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td>/books/checkedOut</td>
+        <td>None</td>
+        <td>List&lt;Book></td>
+        <td>ROLE_ADMIN</td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td>/books/overdue</td>
+        <td>None</td>
+        <td>List&lt;Book></td>
+        <td>ROLE_ADMIN</td>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td>/books/checkout</td>
+        <td>CheckoutRequest</td>
+        <td>CheckoutResponse</td>
+        <td>ROLE_USER</td>
+    </tr>
+</table>
+        </p><p>
+All the objects can be found under the package com.example.library.api.app.bean
+</p>
+</BODY></HTML>

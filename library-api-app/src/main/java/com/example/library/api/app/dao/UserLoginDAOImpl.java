@@ -3,6 +3,7 @@ package com.example.library.api.app.dao;
 import com.example.library.api.app.bean.UserLogin;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Types;
 import java.util.Optional;
@@ -37,6 +38,7 @@ public class UserLoginDAOImpl implements UserLoginDAO {
     }
 
     @Override
+    @Transactional
     public void createNewUser(UserLogin userLogin) {
         jdbcTemplate.update(SQL_CREATE_NEW_USER,
                 userLogin.getUsername(),
